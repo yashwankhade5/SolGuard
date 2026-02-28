@@ -3,11 +3,12 @@ pub mod states;
 use crate::states::*;
 pub mod instructions;
 use crate::instructions::*;
+pub mod error;
 
 
 
 
-declare_id!("9Pgyt8XkZZ9YjG9suPSGsbL6As8keiKA8HPmgpS9XvX");
+declare_id!("4DD8CuS3Nvw42HmoSChupMgr6Q5E5eR7DpX1bYfL52R3");
 
 #[program]
 pub mod multisig_contract {
@@ -29,18 +30,38 @@ pub mod multisig_contract {
         proposer,
         executor,
         approver_weight,
-        approve_threshold)
+        approve_threshold,
+    ctx.bumps.vault,ctx.bumps.vault_state)
                
     }
 
 
 pub fn proposal_create(ctx:Context<ProposalContext>,proposal_type:ProposalType,transfer_amount:u64,
 time_lock_perod:i64,  destination:Pubkey)->Result<()>{
+    
 
     ctx.accounts.proposer_init(proposal_type,transfer_amount,time_lock_perod,  destination)
     
 }
+pub fn approva_proposal(ctx: Context<ApprovalContext>,_proposer_id:u64)->Result<()>{
 
+    ctx.accounts.approved()?;
+
+    Ok(())
+}
+pub fn execute_proposal(ctx: Context<ExecutionContext>,_proposal_id:u64)->Result<()>{
+
+    ctx.accounts.transfer_sol()?;
+
+    Ok(())
+}
+pub fn execute_token_proposal(ctx: Context<ExecutionTokenContext>)->Result<()>{
+
+    
+    ctx.accounts.transfer_token()?;
+
+    Ok(())
+}
 
 
 

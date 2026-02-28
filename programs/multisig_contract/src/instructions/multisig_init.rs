@@ -16,19 +16,20 @@ pub struct Initialize<'info> {
         bump
     )]
     pub multisig: Account<'info, MultisigState>,
-
-    #[account(mut,
-    seeds=[b"vault",vault_state.key().as_ref()],
-    bump)]
-    pub vault: SystemAccount<'info>,
-
-    #[account(init,
+   #[account(init,
     payer=creator,
      space= 8+MultisigState::INIT_SPACE,
         seeds = [b"vault_state",multisig.key().as_ref(),creator.key().as_ref()],
         bump
     )]
     pub vault_state: Account<'info, VaultState>,
+
+    #[account(mut,
+    seeds=[b"vault",vault_state.key().as_ref()],
+    bump)]
+    pub vault: SystemAccount<'info>,
+
+ 
 
     pub clock: Sysvar<'info, Clock>,
 
@@ -46,6 +47,9 @@ impl<'info> Initialize<'info> {
         approver_weight: Vec<u8>,
        
         approve_threshold: u8,
+        vaultbump:u8,
+        vaultstatebump:u8,
+    
     ) -> Result<()> {
         let timestamp = self.clock.unix_timestamp;
 
@@ -63,7 +67,7 @@ impl<'info> Initialize<'info> {
             config_ver: 0,
             approve_threshold,
         });
-
+self.vault_state.set_inner(VaultState { vault_state_bump: vaultstatebump, vault_bump: vaultbump });
 
         Ok(())
     }

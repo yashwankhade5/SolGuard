@@ -12,7 +12,9 @@ pub struct Proposal {
     pub executed_at: i64,//
     pub multisig: Pubkey,
     pub executed: bool,//
-    pub approval_count: u8,//
+    pub approval_count: u8,// 
+    pub approved_by:Vec<bool>,
+    pub proposer_id:u64,
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]

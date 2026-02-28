@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-multisig_contract = "9Pgyt8XkZZ9YjG9suPSGsbL6As8keiKA8HPmgpS9XvX"
+multisig_contract = "4DD8CuS3Nvw42HmoSChupMgr6Q5E5eR7DpX1bYfL52R3"
 
 [registry]
 url = "https://api.apr.dev"
