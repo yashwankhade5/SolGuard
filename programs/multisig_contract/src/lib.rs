@@ -55,7 +55,7 @@ pub fn execute_proposal(ctx: Context<ExecutionContext>,_proposal_id:u64)->Result
 
     Ok(())
 }
-pub fn execute_token_proposal(ctx: Context<ExecutionTokenContext>)->Result<()>{
+pub fn execute_token_proposal(ctx: Context<ExecutionTokenContext>,_proposal_id:u64)->Result<()>{
 
     
     ctx.accounts.transfer_token()?;

@@ -5,6 +5,7 @@ use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface,transfer_checked,TransferChecked};
 
 #[derive(Accounts)]
+#[instruction(proposal_id:u64)]
 pub struct ExecutionTokenContext<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -15,7 +16,7 @@ pub struct ExecutionTokenContext<'info> {
     pub multisig_config: Account<'info, MultisigState>,
 
     #[account(mut,
-    seeds=[b"proposal",multisig_config.key().as_ref(),multisig_config.tx_count.to_le_bytes().as_ref()],
+    seeds=[b"proposal",multisig_config.key().as_ref(),proposal_id.to_le_bytes().as_ref()],
     bump)]
     pub proposal: Account<'info, Proposal>,
 
