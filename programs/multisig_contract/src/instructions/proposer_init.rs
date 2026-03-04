@@ -27,7 +27,8 @@ mut,
         + 1                                 // executed bool
         + 1 
         +8
-        +8,
+        +8
+        +32,
     seeds=[b"proposal",multisig_config.key().as_ref(),multisig_config.tx_count.to_le_bytes().as_ref()],
     bump
 
@@ -56,12 +57,12 @@ impl<'info> ProposalContext<'info> {
                 .position(|x| *x == self.signer.key())
                 .ok_or(MyError::NotProposer)? as u8;
 
-                /////////////////////////////
+              
             msg!("signer {}", self.signer.key());
 msg!("participants {:?}", self.multisig_config.participaints);
 msg!("proposer indexes {:?}", self.multisig_config.proposer);
 msg!("derived proposer index {}", proposer_index);
-///////////////////////
+
 
 
         require!(
@@ -91,7 +92,8 @@ msg!("derived proposer index {}", proposer_index);
             approved_by,
             executed: false,
             approval_count: 0,
-            proposer_id:self.multisig_config.tx_count
+            proposer_id:self.multisig_config.tx_count,
+            proposal_creator:self.signer.key()
         });
 
         self.multisig_config.tx_count +=1;

@@ -36,4 +36,10 @@ pub enum MyError {
     #[msg("Cannot close the account yet")]
    CannotCloseYet,
    
+    #[msg("It is not valid relationship")]
+   InvalidRelationship,
+   
+    #[msg("proposal creator and proposer closer are different")]
+   ProposerandCloserNotMatch,
+   
 }

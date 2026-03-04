@@ -30,7 +30,7 @@ pub struct ExecutionContext<'info> {
     pub vault_state: Account<'info, VaultState>,
 
     #[account(mut,
-    seeds=[b"vault",vault_state.key().as_ref()],
+    seeds=[b"vault",multisig_config.key().as_ref()],
     bump
     )]
     pub vault: SystemAccount<'info>,
@@ -64,8 +64,8 @@ impl<'info> ExecutionContext<'info> {
             MyError::NotEnoughApproval
         );
 
-        let vault_state_key = self.vault_state.key();
-        let signer_seeds: &[&[&[u8]]] = &[&[b"vault", vault_state_key.as_ref(),&[self.vault_state.vault_bump]]];
+        let multisig_config_key = self.multisig_config.key();
+        let signer_seeds: &[&[&[u8]]] = &[&[b"vault", multisig_config_key.as_ref(),&[self.vault_state.vault_bump]]];
         let cpi_context = CpiContext::new(
             self.system_program.to_account_info(),
             Transfer {

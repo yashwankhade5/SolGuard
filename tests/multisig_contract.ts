@@ -43,7 +43,7 @@ describe("multisig_contract", () => {
     program.programId
   );
   const [vaultPda, vaultbump] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("vault"), vaultstatePda.toBuffer()],
+    [Buffer.from("vault"), multiSigPda.toBuffer()],
     program.programId
   );
   describe("multisig_initialized", () => {
@@ -245,7 +245,7 @@ describe("multisig_contract", () => {
   describe(" proposal pda close test", () => {
     it("propsal execution token", async () => {
 
-
+const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
       // console.log("Mint:", mint.toBase58());
       const tx = await program.methods.closeProposal(new anchor.BN(1)).accountsPartial({
         signer: wallet1.publicKey,
@@ -255,10 +255,12 @@ describe("multisig_contract", () => {
         
       }).signers([wallet1]).rpc();
       console.log("Your transaction signature", tx);
+      const afterVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
      
-      const accountinfo = await program.account.proposal.fetch(proposalTokenPda)
+      const accountinfo = await provider.connection.getAccountInfo(proposalTokenPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
-    expect(accountinfo.proposerId).to.equal(new anchor.BN(1))
+    expect(accountinfo).to.be.null
+    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
   })

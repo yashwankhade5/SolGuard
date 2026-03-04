@@ -15,6 +15,7 @@ pub struct Proposal {
     pub approval_count: u8,// 
     pub approved_by:Vec<bool>,
     pub proposer_id:u64,
+    pub proposal_creator:Pubkey
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]

@@ -25,7 +25,7 @@ pub struct Initialize<'info> {
     pub vault_state: Account<'info, VaultState>,
 
     #[account(mut,
-    seeds=[b"vault",vault_state.key().as_ref()],
+    seeds=[b"vault",multisig.key().as_ref()],
     bump)]
     pub vault: SystemAccount<'info>,
 

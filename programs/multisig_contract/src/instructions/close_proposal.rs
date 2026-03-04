@@ -22,7 +22,10 @@ mut,
     #[account(mut,
       seeds=[b"proposal",multisig_config.key().as_ref(),proposer_id.to_le_bytes().as_ref()],
     bump,
-    close = vault
+    close = vault,
+    constraint = proposal.multisig == multisig_config.key() @ MyError::InvalidRelationship,
+    constraint = proposal.proposal_creator ==signer.key()  @MyError::ProposerandCloserNotMatch
+    
     )]
     pub proposal: Account<'info, Proposal>,
  
