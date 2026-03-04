@@ -44,6 +44,15 @@ pub struct ExecutionTokenContext<'info> {
         
     )]
     pub multisig_ata: InterfaceAccount<'info, TokenAccount>,
+#[account(
+        init_if_needed,
+        payer=signer,
+        associated_token::mint= mint,
+        associated_token::authority = destination,
+        associated_token::token_program=token_program
+        
+    )]
+    pub destination_ata: InterfaceAccount<'info, TokenAccount>,
     pub mint: InterfaceAccount<'info, Mint>,
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -53,7 +62,7 @@ pub struct ExecutionTokenContext<'info> {
 }
 
 impl<'info> ExecutionTokenContext<'info> {
-    pub fn transfer_token(&mut self) -> Result<()> {
+    pub fn transfer_token(&mut self,multisig_bump:u8) -> Result<()> {
         let executor_index =
             self.multisig_config
                 .participaints
@@ -68,7 +77,7 @@ impl<'info> ExecutionTokenContext<'info> {
         let current_time = self.clock.unix_timestamp;
 
         require!(
-            self.proposal.time_lock_period > current_time,
+            self.proposal.time_lock_period < current_time,
             MyError::TimeNotElasped
         );
         require!(
@@ -76,7 +85,7 @@ impl<'info> ExecutionTokenContext<'info> {
             MyError::NotEnoughApproval
         );
         require!(
-            self.proposal.executed ==true,
+            self.proposal.executed == false,
             MyError::AlreadyExecuted
         );
 
@@ -84,13 +93,13 @@ impl<'info> ExecutionTokenContext<'info> {
         let signer_seeds: &[&[&[u8]]] = &[&[
             b"multisig",
             self.multisig_config.multisig_name.as_bytes().as_ref(),
-            creator.as_ref(),
+            creator.as_ref(),&[multisig_bump]
         ]];
         let cpi_context = CpiContext::new(
             self.token_program.to_account_info(),
             TransferChecked {
                 from: self.multisig_ata.to_account_info(),
-                to: self.destination.to_account_info(),
+                to: self.destination_ata.to_account_info(),
                 mint:self.mint.to_account_info(),
                 authority:self.multisig_config.to_account_info()
             },

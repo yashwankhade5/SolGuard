@@ -58,11 +58,15 @@ pub fn execute_proposal(ctx: Context<ExecutionContext>,_proposal_id:u64)->Result
 pub fn execute_token_proposal(ctx: Context<ExecutionTokenContext>,_proposal_id:u64)->Result<()>{
 
     
-    ctx.accounts.transfer_token()?;
+    ctx.accounts.transfer_token(ctx.bumps.multisig_config)?;
 
     Ok(())
 }
 
+pub fn close_proposal(ctx: Context<Close>,_proposer_id:u64)->Result<()>{
+    ctx.accounts.close_proposal_pda()?;
+    Ok(())
+}
 
 
 }

@@ -33,5 +33,7 @@ pub enum MyError {
     AlreadyApproved,
     #[msg("Already Executed")]
     AlreadyExecuted,
+    #[msg("Cannot close the account yet")]
+   CannotCloseYet,
    
 }
