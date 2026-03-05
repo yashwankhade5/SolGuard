@@ -19,8 +19,7 @@ pub struct ExecutionContext<'info> {
     bump)]
     pub proposal: Account<'info, Proposal>,
 
-    
-#[account(mut)]
+    #[account(mut)]
     pub destination: SystemAccount<'info>,
 
     #[account(
@@ -35,25 +34,29 @@ pub struct ExecutionContext<'info> {
     )]
     pub vault: SystemAccount<'info>,
 
-    pub clock: Sysvar<'info, Clock>,
-
     pub system_program: Program<'info, System>,
 }
 
 impl<'info> ExecutionContext<'info> {
     pub fn transfer_sol(&mut self) -> Result<()> {
-        let executor_index =
-            self.multisig_config
-                .participaints
-                .iter()
-                .position(|x| *x == self.signer.key())
-                .ok_or(MyError::NoTExecutor)? as u8;
+        let executor_index = self
+            .multisig_config
+            .participaints
+            .iter()
+            .position(|x| *x == self.signer.key())
+            .ok_or(MyError::NoTExecutor)? as u8;
+
+        require!(
+            self.multisig_config.config_ver == self.proposal.proposal_multsig_config_ver,
+            MyError::MultsigVersionMismatch
+        );
 
         require!(
             self.multisig_config.executor.contains(&executor_index),
             MyError::NoTExecutor
         );
-        let current_time = self.clock.unix_timestamp;
+
+        let current_time = Clock::get()?.unix_timestamp;
 
         require!(
             self.proposal.time_lock_period < current_time,
@@ -65,7 +68,12 @@ impl<'info> ExecutionContext<'info> {
         );
 
         let multisig_config_key = self.multisig_config.key();
-        let signer_seeds: &[&[&[u8]]] = &[&[b"vault", multisig_config_key.as_ref(),&[self.vault_state.vault_bump]]];
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            b"vault",
+            multisig_config_key.as_ref(),
+            &[self.vault_state.vault_bump],
+        ]];
+
         let cpi_context = CpiContext::new(
             self.system_program.to_account_info(),
             Transfer {
@@ -75,8 +83,9 @@ impl<'info> ExecutionContext<'info> {
         )
         .with_signer(signer_seeds);
         transfer(cpi_context, self.proposal.transfer_amount)?;
-   self.proposal.executed=true;
-        self.proposal.executed_at =current_time;
+
+        self.proposal.executed = true;
+        self.proposal.executed_at = current_time;
         Ok(())
     }
 }

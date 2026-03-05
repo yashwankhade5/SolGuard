@@ -29,13 +29,13 @@ mut,
     )]
     pub proposal: Account<'info, Proposal>,
  
-       pub clock: Sysvar<'info, Clock>,
+    
 }
 
 impl <'info> Close<'info>  {
     pub fn close_proposal_pda(&mut self)->Result<()>{
 
-        let current_time = self.clock.unix_timestamp;
+        let current_time = Clock::get()?.unix_timestamp;
  require!(
         self.proposal.executed || current_time > self.proposal.time_lock_period,
         MyError::CannotCloseYet

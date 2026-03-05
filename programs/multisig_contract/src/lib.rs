@@ -68,6 +68,27 @@ pub fn close_proposal(ctx: Context<Close>,_proposer_id:u64)->Result<()>{
     Ok(())
 }
 
+pub fn change_multis(ctx: Context<ChangeMultisigConfig>, multisig_name: String,
+        owners: Vec<Pubkey>,
+        approver: Vec<u8>,
+        proposer: Vec<u8>,
+        executor: Vec<u8>,
+        approver_weight: Vec<u8>,
+        approve_threshold: u8
+    ) -> Result<()> {
+
+
+        ctx.accounts.change_config( multisig_name,
+        owners,
+        approver,
+        proposer,
+        executor,
+        approver_weight,
+        approve_threshold,
+   )
+               
+    }
+
 
 }
 

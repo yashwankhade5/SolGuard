@@ -31,8 +31,6 @@ pub struct Initialize<'info> {
 
  
 
-    pub clock: Sysvar<'info, Clock>,
-
     pub system_program: Program<'info, System>,
 }
 
@@ -51,7 +49,7 @@ impl<'info> Initialize<'info> {
         vaultstatebump:u8,
     
     ) -> Result<()> {
-        let timestamp = self.clock.unix_timestamp;
+        let timestamp = Clock::get()?.unix_timestamp;
 
         self.multisig.set_inner(MultisigState {
             multisig_name,
@@ -66,6 +64,7 @@ impl<'info> Initialize<'info> {
             created_at: timestamp,
             config_ver: 0,
             approve_threshold,
+            
         });
 self.vault_state.set_inner(VaultState { vault_state_bump: vaultstatebump, vault_bump: vaultbump });
 

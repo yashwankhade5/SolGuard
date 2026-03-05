@@ -28,14 +28,15 @@ mut,
         + 1 
         +8
         +8
-        +32,
+        +32
+        +8,
     seeds=[b"proposal",multisig_config.key().as_ref(),multisig_config.tx_count.to_le_bytes().as_ref()],
     bump
 
 )]
     pub proposal: Account<'info, Proposal>,
 
-    pub clock: Sysvar<'info, Clock>,
+  
 
     pub system_program: Program<'info, System>,
 }
@@ -58,10 +59,10 @@ impl<'info> ProposalContext<'info> {
                 .ok_or(MyError::NotProposer)? as u8;
 
               
-            msg!("signer {}", self.signer.key());
-msg!("participants {:?}", self.multisig_config.participaints);
-msg!("proposer indexes {:?}", self.multisig_config.proposer);
-msg!("derived proposer index {}", proposer_index);
+        msg!("signer {}", self.signer.key());
+        msg!("participants {:?}", self.multisig_config.participaints);
+        msg!("proposer indexes {:?}", self.multisig_config.proposer);
+        msg!("derived proposer index {}", proposer_index);
 
 
 
@@ -71,7 +72,7 @@ msg!("derived proposer index {}", proposer_index);
         );
 
 
-        let timestamp = self.clock.unix_timestamp;
+        let timestamp = Clock::get()?.unix_timestamp;
 
         let mut approved_by = vec![true; self.multisig_config.approver_weight.len()];
 
@@ -93,7 +94,8 @@ msg!("derived proposer index {}", proposer_index);
             executed: false,
             approval_count: 0,
             proposer_id:self.multisig_config.tx_count,
-            proposal_creator:self.signer.key()
+            proposal_creator:self.signer.key(),
+            proposal_multsig_config_ver:self.multisig_config.config_ver
         });
 
         self.multisig_config.tx_count +=1;

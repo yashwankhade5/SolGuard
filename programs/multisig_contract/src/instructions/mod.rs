@@ -11,3 +11,5 @@ pub mod execution_token;
 pub use execution_token::*;
 pub mod close_proposal;
 pub use close_proposal::*;
+pub mod change_multisig;
+pub use change_multisig::*;

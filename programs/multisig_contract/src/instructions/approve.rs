@@ -40,6 +40,10 @@ impl<'info> ApprovalContext<'info> {
             self.multisig_config.approver.contains(&approver_index),
             MyError::NoTApprover
         );
+        require!(
+            self.multisig_config.config_ver==self.proposal.proposal_multsig_config_ver,
+            MyError::MultsigVersionMismatch
+        );
 
         msg!(&(self.multisig_config.approver.contains(&approver_index)).to_string());
         require!(

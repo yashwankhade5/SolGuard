@@ -41,5 +41,15 @@ pub enum MyError {
    
     #[msg("proposal creator and proposer closer are different")]
    ProposerandCloserNotMatch,
+    #[msg("signer is not a multisig participant")]
+   NotParticipant,
+    #[msg("this propsal doesnt belong to this multisig")]
+   InvalidProposal,
+    #[msg("proposal transfer amount is invalid")]
+   InvalidAmount,
+    #[msg("proposal type doesnt belong to this execution instruction it is for execute_proposal")]
+   InvalidProposalType,
+    #[msg("proposal and multsig config version mismatch it is a proposal before multisig config changed")]
+   MultsigVersionMismatch,
    
 }
