@@ -15,3 +15,5 @@ pub mod change_multisig;
 pub use change_multisig::*;
 pub mod proposal_change_multisig_config;
 pub use proposal_change_multisig_config::*;
+pub mod close_multisig;
+pub use close_multisig::*;

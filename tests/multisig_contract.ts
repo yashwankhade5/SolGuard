@@ -4,27 +4,32 @@ import { MultisigContract } from "../target/types/multisig_contract";
 import { AccountsResolver } from "@coral-xyz/anchor/dist/cjs/program/accounts-resolver";
 import { expect } from "chai";
 import chaiBN from "chai-bn";
-import { createMint, getAccount, getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID, } from "@solana/spl-token";
-
+import fs from "fs";
+import { Keypair } from "@solana/web3.js";
+import { createMint, getAccount, getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID,closeAccount } from "@solana/spl-token";
+function loadKeypair(path: string): Keypair {
+  const secret = JSON.parse(fs.readFileSync(path, "utf8"));
+  return Keypair.fromSecretKey(new Uint8Array(secret));
+}
 describe("multisig_contract", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
   const program = anchor.workspace.multisigContract as Program<MultisigContract>;
-  const wallet1 = anchor.web3.Keypair.generate()
-  const wallet2 = anchor.web3.Keypair.generate()
+  const wallet1 = loadKeypair("../wallet1.json")
+  const wallet2 = loadKeypair("../wallet2.json")
   before(async () => {
-    const sig = await provider.connection.requestAirdrop(wallet1.publicKey, 1000 * anchor.web3.LAMPORTS_PER_SOL)
-    await provider.connection.confirmTransaction({
-      signature: sig,
-      ...(await provider.connection.getLatestBlockhash())
-    })
-    const sig1 = await provider.connection.requestAirdrop(wallet2.publicKey, 1000 * anchor.web3.LAMPORTS_PER_SOL)
-    await provider.connection.confirmTransaction({
-      signature: sig1,
-      ...(await provider.connection.getLatestBlockhash())
-    })
+    // const sig = await provider.connection.requestAirdrop(wallet1.publicKey, 1000 * anchor.web3.LAMPORTS_PER_SOL)
+    // await provider.connection.confirmTransaction({
+    //   signature: sig,
+    //   ...(await provider.connection.getLatestBlockhash())
+    // })
+    // const sig1 = await provider.connection.requestAirdrop(wallet2.publicKey, 1000 * anchor.web3.LAMPORTS_PER_SOL)
+    // await provider.connection.confirmTransaction({
+    //   signature: sig1,
+    //   ...(await provider.connection.getLatestBlockhash())
+    // })
   })
   const [multiSigPda, bump] = anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from("multisig"), Buffer.from("mulsig"), wallet1.publicKey.toBuffer()],
@@ -56,11 +61,13 @@ describe("multisig_contract", () => {
 
       }).signers([wallet1]).rpc();
       // console.log("Your transaction signature", tx);
-      const sig = await provider.connection.requestAirdrop(vaultPda, 1000 * anchor.web3.LAMPORTS_PER_SOL)
-      await provider.connection.confirmTransaction({
-        signature: sig,
-        ...(await provider.connection.getLatestBlockhash())
-      })
+      // const sig = await provider.connection.requestAirdrop(vaultPda, 3 * anchor.web3.LAMPORTS_PER_SOL)
+      // await provider.connection.confirmTransaction({
+      //   signature: sig,
+      //   ...(await provider.connection.getLatestBlockhash())
+      // })
+
+
 
       const accountinfo = await program.account.multisigState.fetch(multiSigPda)
 
@@ -75,7 +82,7 @@ describe("multisig_contract", () => {
     it("proposal creation", async () => {
       // Add your test here.
       const tx = await program.methods.proposalCreate({ transferSol: {} },
-        new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL),
+        new anchor.BN(1 * anchor.web3.LAMPORTS_PER_SOL),
         new anchor.BN(1771718400),
         wallet2.publicKey
       ).accountsPartial({
@@ -140,7 +147,7 @@ describe("multisig_contract", () => {
   describe("token proposal creation test", () => {
     it("proposal token creation", async () => {
       // Add your test here.
-      const mintkey = new anchor.web3.PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+      // const mintkey = new anchor.web3.PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
       const tx = await program.methods.proposalCreate({ transferToken: {} },
         new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL),
         new anchor.BN(1771718400),
@@ -233,6 +240,15 @@ describe("multisig_contract", () => {
         provider.connection,
         destinationAta
       )
+        const txclose = await closeAccount(
+    provider.connection,
+    wallet1,           // fee payer
+    mint,      // the mint account to close
+    wallet1.publicKey,     // receive SOL here
+    wallet1            // authority (mint authority)
+  
+  );
+  console.log("mint close ",txclose)
       const accountinfo = await program.account.proposal.fetch(proposalTokenPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
       expect(accountinfo.multisig).to.deep.equal(multiSigPda)
@@ -271,13 +287,13 @@ const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).
         signer: wallet1.publicKey,
         vault:vaultPda,
         multisigConfig:multiSigPda,
-        proposal:proposalTokenPda
+        proposal:proposalPda
         
       }).signers([wallet1]).rpc();
       console.log("Your transaction signature", tx);
       const afterVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
      
-      const accountinfo = await provider.connection.getAccountInfo(proposalTokenPda)
+      const accountinfo = await provider.connection.getAccountInfo(proposalPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
     expect(accountinfo).to.be.null
     expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)

@@ -51,5 +51,7 @@ pub enum MyError {
    InvalidProposalType,
     #[msg("proposal and multsig config version mismatch it is a proposal before multisig config changed")]
    MultsigVersionMismatch,
+    #[msg("Signer is Not a multisig creator")]
+   NotMultisigCreator,
    
 }
