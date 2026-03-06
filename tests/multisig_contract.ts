@@ -263,6 +263,26 @@ const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).
     expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
+    it("propsal execution token", async () => {
+
+const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
+      // console.log("Mint:", mint.toBase58());
+      const tx = await program.methods.closeProposal(new anchor.BN(0)).accountsPartial({
+        signer: wallet1.publicKey,
+        vault:vaultPda,
+        multisigConfig:multiSigPda,
+        proposal:proposalTokenPda
+        
+      }).signers([wallet1]).rpc();
+      console.log("Your transaction signature", tx);
+      const afterVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
+     
+      const accountinfo = await provider.connection.getAccountInfo(proposalTokenPda)
+      const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
+    expect(accountinfo).to.be.null
+    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
+
+    });
   })
 
 

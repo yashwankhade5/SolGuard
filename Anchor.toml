@@ -12,7 +12,7 @@ multisig_contract = "4DD8CuS3Nvw42HmoSChupMgr6Q5E5eR7DpX1bYfL52R3"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

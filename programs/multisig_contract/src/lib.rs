@@ -68,8 +68,30 @@ pub mod multisig_contract {
         Ok(())
     }
 
-    pub fn change_multis(
-        ctx: Context<ChangeMultisigConfig>,
+    // pub fn change_multis(
+    //     ctx: Context<ChangeMultisigConfig>,
+    //     multisig_name: String,
+    //     owners: Vec<Pubkey>,
+    //     approver: Vec<u8>,
+    //     proposer: Vec<u8>,
+    //     executor: Vec<u8>,
+    //     approver_weight: Vec<u8>,
+    //     approve_threshold: u8,
+    // ) -> Result<()> {
+
+    //     ctx.accounts.change_config(
+    //         multisig_name,
+    //         owners,
+    //         approver,
+    //         proposer,
+    //         executor,
+    //         approver_weight,
+    //         approve_threshold,
+    //     )
+    // }
+    pub fn change_multis_proposal(
+        ctx: Context<ChangeConfigProposalContext>,
+        proposal_type: ProposalType,
         multisig_name: String,
         owners: Vec<Pubkey>,
         approver: Vec<u8>,
@@ -77,9 +99,10 @@ pub mod multisig_contract {
         executor: Vec<u8>,
         approver_weight: Vec<u8>,
         approve_threshold: u8,
+        time_lock_perod: i64
     ) -> Result<()> {
-        
-        ctx.accounts.change_config(
+        ctx.accounts.change_config_proposal_init(
+            proposal_type,
             multisig_name,
             owners,
             approver,
@@ -87,6 +110,7 @@ pub mod multisig_contract {
             executor,
             approver_weight,
             approve_threshold,
+            time_lock_perod
         )
     }
 }

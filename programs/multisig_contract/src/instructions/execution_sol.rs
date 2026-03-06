@@ -66,6 +66,10 @@ impl<'info> ExecutionContext<'info> {
             self.multisig_config.approve_threshold <= self.proposal.approval_count,
             MyError::NotEnoughApproval
         );
+          require!(
+            self.multisig_config.config_ver==self.proposal.proposal_multsig_config_ver,
+            MyError::MultsigVersionMismatch
+        );
 
         let multisig_config_key = self.multisig_config.key();
         let signer_seeds: &[&[&[u8]]] = &[&[
