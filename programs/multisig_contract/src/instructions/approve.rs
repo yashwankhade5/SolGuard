@@ -22,7 +22,7 @@ mut,
 
 )]
     pub proposal: Account<'info, Proposal>,
-    pub clock: Sysvar<'info, Clock>,
+    
 
     pub system_program: Program<'info, System>,
 }

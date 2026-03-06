@@ -9,10 +9,7 @@ pub struct ChangeMultisigConfig<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
 
-    #[account(
-        init,
-        payer=creator,
-        space= 8+MultisigState::INIT_SPACE,
+    #[account(mut,
         seeds = [b"multisig",multisig_name.as_bytes().as_ref(),creator.key().as_ref()],
         bump
     )]
@@ -32,7 +29,7 @@ impl <'info> ChangeMultisigConfig<'info>{
        
         approve_threshold: u8,
         )->Result<()>{
-            
+
 
 self.multisig.multisig_name=multisig_name;
 self.multisig.participaints=owners;
