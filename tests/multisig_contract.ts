@@ -285,13 +285,13 @@ const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).
       const accountinfo = await provider.connection.getAccountInfo(proposalTokenPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
     expect(accountinfo).to.be.null
-    // expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
+    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
     it("propsal pda close 1", async () => {
 
 const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
-      // console.log("Mint:", mint.toBase58());
+      
       const tx = await program.methods.closeProposal(new anchor.BN(0)).accountsPartial({
         signer: wallet1.publicKey,
         vault:vaultPda,
@@ -305,7 +305,7 @@ const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).
       const accountinfo = await provider.connection.getAccountInfo(proposalPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
     expect(accountinfo).to.be.null
-    // expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
+    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
   })

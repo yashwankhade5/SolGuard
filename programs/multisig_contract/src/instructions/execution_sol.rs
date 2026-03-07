@@ -70,10 +70,14 @@ impl<'info> ExecutionContext<'info> {
             self.multisig_config.config_ver==self.proposal.proposal_multsig_config_ver,
             MyError::MultsigVersionMismatch
         );
-          require!(
-            self.vault.lamports() - Rent::get()?.minimum_balance(0)>=self.proposal.transfer_amount,
-            MyError::NotEnoughSol
-        );
+       let rent = Rent::get()?;
+let min_balance = rent.minimum_balance(0);
+let available = self.vault.lamports().saturating_sub(min_balance);
+
+require!(
+    available >= self.proposal.transfer_amount,
+    MyError::NotEnoughSol
+);
 
         let multisig_config_key = self.multisig_config.key();
         let signer_seeds: &[&[&[u8]]] = &[&[

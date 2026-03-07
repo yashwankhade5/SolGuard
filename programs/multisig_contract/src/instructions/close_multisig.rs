@@ -1,4 +1,6 @@
-use anchor_lang::{accounts::signer, prelude::*};
+use anchor_lang::{ prelude::*};
+
+use anchor_lang::system_program::{transfer, Transfer};
 
 use crate::{error::MyError, states::*};
 
@@ -40,7 +42,31 @@ pub struct CloseMultisig<'info> {
 
 impl <'info> CloseMultisig<'info> {
     pub fn close_multisig(&mut self)->Result<()>{
-        
+
+
+
+    let multisig_config_key = self.multisig.key();
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            b"vault",
+            multisig_config_key.as_ref(),
+            &[self.vault_state.vault_bump],
+        ]];
+
+        let cpi_context = CpiContext::new(
+            self.system_program.to_account_info(),
+            Transfer {
+                from: self.vault.to_account_info(),
+                to: self.creator.to_account_info(),
+            },
+        )
+        .with_signer(signer_seeds);
+        transfer(cpi_context, self.vault.lamports())?;
+        msg!(
+    "Transfer {} lamports from vault {} to {}",
+    self.vault.lamports(),
+    self.vault.key(),
+    self.creator.key()
+);
 
 
         Ok(())
