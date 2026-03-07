@@ -6,7 +6,7 @@ use crate::{error::MyError, states::*};
 #[instruction(multisig_name:String)]
 
 
-pub struct Initialize<'info> {
+pub struct CloseMultisig<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
 
@@ -35,4 +35,16 @@ pub struct Initialize<'info> {
  
 
     pub system_program: Program<'info, System>,
+} 
+
+
+impl <'info> CloseMultisig<'info> {
+    pub fn close_multisig(&mut self)->Result<()>{
+        
+
+
+        Ok(())
+    }
+
+
 }
