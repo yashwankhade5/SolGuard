@@ -17,14 +17,14 @@ mut,
 
     #[account(init,
     payer=signer,
-    space=8+1                               // ProposalType enum (1 byte)
-        + 8                                 // transfer_amount u64
-        + 8                                 // created_at i64
-        + 32                                // destination Pubkey
-        + 8                                 // time_lock_period i64
-        + 8                                 // executed_at i64
-        + 32                                // multisig Pubkey
-        + 1                                 // executed bool
+    space=8+1                               
+        + 8                          
+        + 8                     
+        + 32                        
+        + 8                           
+        + 8                      
+        + 32   
+        + 1                                 
         + 1 
         +8
         +8

@@ -6,11 +6,14 @@ import { expect } from "chai";
 import chaiBN from "chai-bn";
 import path from "path";
 import fs from "fs";
-import { Keypair, SystemProgram,
+import {
+  Keypair, SystemProgram,
   LAMPORTS_PER_SOL,
   Transaction,
-  sendAndConfirmTransaction,Connection } from "@solana/web3.js";
-import { createMint, getAccount, getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID,closeAccount } from "@solana/spl-token";
+  sendAndConfirmTransaction, Connection
+} from "@solana/web3.js";
+import { createMint, getAccount, getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID, closeAccount } from "@solana/spl-token";
+import { equal } from "assert";
 function loadKeypair(path: string): Keypair {
   const secret = JSON.parse(fs.readFileSync(path, "utf8"));
   return Keypair.fromSecretKey(new Uint8Array(secret));
@@ -21,8 +24,8 @@ describe("multisig_contract", () => {
   anchor.setProvider(provider);
 
   const program = anchor.workspace.multisigContract as Program<MultisigContract>;
-  const wallet1 = loadKeypair(path.join(__dirname,"../wallet1.json"))
-  const wallet2 = loadKeypair(path.join(__dirname,"../wallet2.json"))
+  const wallet1 = loadKeypair(path.join(__dirname, "../wallet1.json"))
+  const wallet2 = loadKeypair(path.join(__dirname, "../wallet2.json"))
   before(async () => {
     // const sig = await provider.connection.requestAirdrop(wallet1.publicKey, 1000 * anchor.web3.LAMPORTS_PER_SOL)
     // await provider.connection.confirmTransaction({
@@ -55,6 +58,7 @@ describe("multisig_contract", () => {
     [Buffer.from("vault"), multiSigPda.toBuffer()],
     program.programId
   );
+
   describe("multisig_initialized", () => {
     it("Is initialized!", async () => {
       // Add your test here.
@@ -70,20 +74,20 @@ describe("multisig_contract", () => {
       //   signature: sig,
       //   ...(await provider.connection.getLatestBlockhash())
       // })
-const transferTransaction = new Transaction().add(
-  SystemProgram.transfer({
-    fromPubkey: wallet1.publicKey,
-    toPubkey: vaultPda,
-    lamports: 1.5*anchor.web3.LAMPORTS_PER_SOL
-  })
-);
+      const transferTransaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: wallet1.publicKey,
+          toPubkey: vaultPda,
+          lamports: 1.5 * anchor.web3.LAMPORTS_PER_SOL
+        })
+      );
 
-const signature = await sendAndConfirmTransaction(
-  provider.connection,
-  transferTransaction,
-  [wallet1]
-);
-console.log("Transaction Signature:", signature);
+      const signature = await sendAndConfirmTransaction(
+        provider.connection,
+        transferTransaction,
+        [wallet1]
+      );
+      console.log("Transaction Signature:", signature);
 
 
       const accountinfo = await program.account.multisigState.fetch(multiSigPda)
@@ -258,7 +262,7 @@ console.log("Transaction Signature:", signature);
         provider.connection,
         destinationAta
       )
- 
+
       const accountinfo = await program.account.proposal.fetch(proposalTokenPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
       expect(accountinfo.multisig).to.deep.equal(multiSigPda)
@@ -271,62 +275,64 @@ console.log("Transaction Signature:", signature);
   describe(" proposal pda close test", () => {
     it("propsal pda close 2", async () => {
 
-const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
+      const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
       // console.log("Mint:", mint.toBase58());
       const tx = await program.methods.closeProposal(new anchor.BN(1)).accountsPartial({
         signer: wallet1.publicKey,
-        vault:vaultPda,
-        multisigConfig:multiSigPda,
-        proposal:proposalTokenPda
-        
+        vault: vaultPda,
+        multisigConfig: multiSigPda,
+        proposal: proposalTokenPda
+
       }).signers([wallet1]).rpc();
-      console.log("Your transaction signature", tx);
+      // console.log("Your transaction signature", tx);
       const afterVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
-     
+
       const accountinfo = await provider.connection.getAccountInfo(proposalTokenPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
-    expect(accountinfo).to.be.null
-    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
+      expect(accountinfo).to.be.null
+      expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
     it("propsal pda close 1", async () => {
 
-const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
-      
+      const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
+
       const tx = await program.methods.closeProposal(new anchor.BN(0)).accountsPartial({
         signer: wallet1.publicKey,
-        vault:vaultPda,
-        multisigConfig:multiSigPda,
-        proposal:proposalPda
-        
+        vault: vaultPda,
+        multisigConfig: multiSigPda,
+        proposal: proposalPda
+
       }).signers([wallet1]).rpc();
-      console.log("Your transaction signature", tx);
+      // console.log("Your transaction signature", tx);
       const afterVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).lamports
-     
+
       const accountinfo = await provider.connection.getAccountInfo(proposalPda)
       const destinationaccount = await provider.connection.getAccountInfo(wallet2.publicKey)
-    expect(accountinfo).to.be.null
-    expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
+      expect(accountinfo).to.be.null
+      expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
   })
+
+
   describe("close multisig test", () => {
     it("close multisig pdas", async () => {
-      
 
-const beforemultisig = await program.account.multisigState.fetch(multiSigPda)
-      console.log("tx_count:",beforemultisig.txCount);
+
+      const beforemultisig = await program.account.multisigState.fetch(multiSigPda)
+      // console.log("tx_count:", beforemultisig.txCount);
       const beforedestinationaccount = await provider.connection.getAccountInfo(wallet1.publicKey)
       const tx = await program.methods.closeMultisig("mulsig").accountsPartial({
         creator: wallet1.publicKey,
-        vault:vaultPda,
-        multisig:multiSigPda,
-        vaultState:vaultstatePda      
+        vault: vaultPda,
+        multisig: multiSigPda,
+        vaultState: vaultstatePda
       }).signers([wallet1]).rpc();
-      console.log("Your transaction signature", tx);
-     
-     
-     
+      // console.log("Your transaction signature", tx);
+
+
+
       const afterdestinationaccount = await provider.connection.getAccountInfo(wallet1.publicKey)
       const multisig = await provider.connection.getAccountInfo(multiSigPda)
       const vault = await provider.connection.getAccountInfo(vaultPda)
@@ -336,10 +342,10 @@ const beforemultisig = await program.account.multisigState.fetch(multiSigPda)
       expect(multisig).to.be.null
       expect(vault).to.be.null
       expect(vaultstate).to.be.null
-   
+
 
     });
- 
+
   })
 
 
