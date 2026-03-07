@@ -74,7 +74,7 @@ const transferTransaction = new Transaction().add(
   SystemProgram.transfer({
     fromPubkey: wallet1.publicKey,
     toPubkey: vaultPda,
-    lamports: 1*anchor.web3.LAMPORTS_PER_SOL
+    lamports: 1.5*anchor.web3.LAMPORTS_PER_SOL
   })
 );
 
@@ -120,6 +120,7 @@ console.log("Transaction Signature:", signature);
   })
   describe("proposal approved", () => {
     it("proposal approval", async () => {
+      const proposal_id = (await program.account.multisigState.fetch(multiSigPda)).txCount
       // Add your test here.
       const tx = await program.methods.approvaProposal(new anchor.BN(0)).accountsPartial({
         signer: wallet1.publicKey,
@@ -308,6 +309,37 @@ const beforeVaultBalance = (await provider.connection.getAccountInfo(vaultPda)).
     expect(afterVaultBalance).to.be.greaterThan(beforeVaultBalance)
 
     });
+  })
+  describe("close multisig test", () => {
+    it("close multisig pdas", async () => {
+      
+
+const beforemultisig = await program.account.multisigState.fetch(multiSigPda)
+      console.log("tx_count:",beforemultisig.txCount);
+      const beforedestinationaccount = await provider.connection.getAccountInfo(wallet1.publicKey)
+      const tx = await program.methods.closeMultisig("mulsig").accountsPartial({
+        creator: wallet1.publicKey,
+        vault:vaultPda,
+        multisig:multiSigPda,
+        vaultState:vaultstatePda      
+      }).signers([wallet1]).rpc();
+      console.log("Your transaction signature", tx);
+     
+     
+     
+      const afterdestinationaccount = await provider.connection.getAccountInfo(wallet1.publicKey)
+      const multisig = await provider.connection.getAccountInfo(multiSigPda)
+      const vault = await provider.connection.getAccountInfo(vaultPda)
+      const vaultstate = await provider.connection.getAccountInfo(vaultstatePda)
+
+      expect(afterdestinationaccount.lamports).to.be.greaterThan(beforedestinationaccount.lamports)
+      expect(multisig).to.be.null
+      expect(vault).to.be.null
+      expect(vaultstate).to.be.null
+   
+
+    });
+ 
   })
 
 

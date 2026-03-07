@@ -40,6 +40,7 @@ impl <'info> Close<'info>  {
         self.proposal.executed || current_time > self.proposal.time_lock_period,
         MyError::CannotCloseYet
     );
+    msg!("Closing proposal PDA...");
         Ok(())
     }
 }

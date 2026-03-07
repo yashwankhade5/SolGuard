@@ -1,4 +1,4 @@
-use anchor_lang::{ prelude::*};
+use anchor_lang::prelude::*;
 
 use anchor_lang::system_program::{transfer, Transfer};
 
@@ -6,7 +6,6 @@ use crate::{error::MyError, states::*};
 
 #[derive(Accounts)]
 #[instruction(multisig_name:String)]
-
 
 pub struct CloseMultisig<'info> {
     #[account(mut)]
@@ -20,7 +19,7 @@ pub struct CloseMultisig<'info> {
         constraint= multisig.creator ==creator.key() @ MyError::NotMultisigCreator
     )]
     pub multisig: Account<'info, MultisigState>,
-   #[account(mut,
+    #[account(mut,
         seeds = [b"vault_state",multisig.key().as_ref(),creator.key().as_ref()],
         bump,
         close=creator,
@@ -34,18 +33,12 @@ pub struct CloseMultisig<'info> {
 )]
     pub vault: SystemAccount<'info>,
 
- 
-
     pub system_program: Program<'info, System>,
-} 
+}
 
-
-impl <'info> CloseMultisig<'info> {
-    pub fn close_multisig(&mut self)->Result<()>{
-
-
-
-    let multisig_config_key = self.multisig.key();
+impl<'info> CloseMultisig<'info> {
+    pub fn close_multisig(&mut self) -> Result<()> {
+        let multisig_config_key = self.multisig.key();
         let signer_seeds: &[&[&[u8]]] = &[&[
             b"vault",
             multisig_config_key.as_ref(),
@@ -62,15 +55,13 @@ impl <'info> CloseMultisig<'info> {
         .with_signer(signer_seeds);
         transfer(cpi_context, self.vault.lamports())?;
         msg!(
-    "Transfer {} lamports from vault {} to {}",
-    self.vault.lamports(),
-    self.vault.key(),
-    self.creator.key()
-);
-
+            "Transfer {} lamports from vault {} to {}",
+            self.vault.lamports(),
+            self.vault.key(),
+            self.creator.key()
+        );
+        msg!("Closing multisig  PDA...");
 
         Ok(())
     }
-
-
 }

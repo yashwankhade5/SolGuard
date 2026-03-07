@@ -9,14 +9,14 @@ pub struct Initialize<'info> {
     pub creator: Signer<'info>,
 
     #[account(
-        init,
+        init_if_needed,
         payer=creator,
         space= 8+MultisigState::INIT_SPACE,
         seeds = [b"multisig",multisig_name.as_bytes().as_ref(),creator.key().as_ref()],
         bump
     )]
     pub multisig: Account<'info, MultisigState>,
-   #[account(init,
+   #[account(init_if_needed,
     payer=creator,
      space= 8+MultisigState::INIT_SPACE,
         seeds = [b"vault_state",multisig.key().as_ref(),creator.key().as_ref()],
