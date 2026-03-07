@@ -8,3 +8,5 @@ test-ledger
 .surfpool
 deployoutput.txt
 justtest.txt
+wallet1.json
+wallet2.json
